@@ -1,0 +1,46 @@
+import numpy as np
+import pandas as pd
+from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score
+
+iris = load_iris()
+X = iris.data
+y = iris.target
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+def forward_stepwise_selection(X_train, X_test, y_train, y_test):
+    selected_features = []
+    all_features = set(range(X_train.shape[1]))
+
+    while all_features:
+        best_accuracy = 0
+        best_feature = None
+
+        for feature in all_features:
+            current_features = selected_features + [feature]
+            
+            model = LogisticRegression()
+            model.fit(X_train[:, current_features], y_train)
+            
+            y_pred = model.predict(X_test[:, current_features])
+
+            accuracy = accuracy_score(y_test, y_pred)
+
+            if accuracy > best_accuracy:
+                best_accuracy = accuracy
+                best_feature = feature
+
+        if best_feature is not None:
+            selected_features.append(best_feature)
+            all_features.remove(best_feature)
+        else:
+            break
+
+    return selected_features
+
+selected_features = forward_stepwise_selection(X_train, X_test, y_train, y_test)
+
+print("Selected Features:", selected_features)
