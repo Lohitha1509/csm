@@ -1,0 +1,39 @@
+import numpy as np
+import pandas as pd
+from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score
+
+iris = load_iris()
+X = iris.data
+y = iris.target
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+def backward_stepwise_selection(X, y, model):
+    selected_features = list(range(X.shape[1]))
+
+    while len(selected_features) > 0:
+        accuracies = []
+        for feature in selected_features:
+            remaining_features = list(set(selected_features) - {feature})
+            if len(remaining_features) > 0:  
+                model.fit(X_train[:, remaining_features], y_train)
+                y_pred = model.predict(X_test[:, remaining_features])
+                accuracy = accuracy_score(y_test, y_pred)
+                accuracies.append(accuracy)
+
+        if len(accuracies) > 0:
+            worst_feature_index = np.argmin(accuracies)
+            worst_feature = selected_features[worst_feature_index]
+            selected_features.remove(worst_feature)
+            print(f"Removed feature {worst_feature}, Accuracy: {accuracies[worst_feature_index]}")
+        else:
+            break 
+
+    print("Selected features:", selected_features)
+
+model = LogisticRegression(max_iter=1000, random_state=42)
+backward_stepwise_selection(X_train, y_train, model)
+
