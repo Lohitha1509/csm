@@ -1,0 +1,43 @@
+# Custom exception for invalid formula
+class FormulaError(Exception):
+    pass
+
+def calculate(formula):
+    try:
+        # Split the input formula into three parts
+        elements = formula.split()
+
+        # Check if the formula consists of 3 elements
+        if len(elements) != 3:
+            raise FormulaError("Invalid formula. Please provide a formula with 3 elements.")
+
+        # Extract and convert the first and third elements to float
+        operand1 = float(elements[0])
+        operand2 = float(elements[2])
+
+        # Check if the second element is a valid operator (+ or -)
+        operator = elements[1]
+        if operator not in ('+', '-'):
+            raise FormulaError("Invalid operator. Please use + or -.")
+
+        # Perform the calculation based on the operator
+        result = operand1 + operand2 if operator == '+' else operand1 - operand2
+
+        # Print the result
+        print("Result:", result)
+
+    except ValueError:
+        raise FormulaError("Invalid input. Please provide valid numeric values.")
+
+# Interactive calculator loop
+while True:
+    user_input = input("Enter a formula (or 'quit' to exit): ")
+
+    if user_input.lower() == 'quit':
+        break
+
+    try:
+        calculate(user_input)
+
+    except FormulaError as e:
+        print(f"Error: {e}")
