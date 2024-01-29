@@ -1,0 +1,45 @@
+import threading
+import random
+import time
+
+# Global variable to store the generated random number
+shared_number = None
+
+# Lock to synchronize access to the shared_number
+lock = threading.Lock()
+
+def generate_random_number():
+    global shared_number
+    while True:
+        with lock:
+            shared_number = random.randint(1, 100)
+        time.sleep(1)
+
+def compute_square():
+    while True:
+        with lock:
+            if shared_number is not None and shared_number % 2 == 0:
+                print(f"Square of {shared_number}: {shared_number ** 2}")
+        time.sleep(1)
+
+def print_cube():
+    while True:
+        with lock:
+            if shared_number is not None and shared_number % 2 != 0:
+                print(f"Cube of {shared_number}: {shared_number ** 3}")
+        time.sleep(1)
+
+# Create threads
+thread1 = threading.Thread(target=generate_random_number)
+thread2 = threading.Thread(target=compute_square)
+thread3 = threading.Thread(target=print_cube)
+
+# Start threads
+thread1.start()
+thread2.start()
+thread3.start()
+
+# Join threads to ensure the main program waits for them to finish
+thread1.join()
+thread2.join()
+thread3.join()
