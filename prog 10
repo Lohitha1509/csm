@@ -1,0 +1,36 @@
+import threading
+import time
+
+# Synchronization using Event
+event = threading.Event()
+
+def function_A():
+    for num in range(1, 6):
+        print(num, end=' ')
+        event.set()  # Set the event to signal that function_A has completed
+        time.sleep(0.5)  # Simulate time-consuming task
+        event.clear()  # Clear the event for synchronization
+
+def function_B():
+    letters = ['A', 'B', 'C', 'D', 'E']
+    for letter in letters:
+        event.wait()  # Wait for the event to be set by function_A
+        print(letter, end=' ')
+        time.sleep(0.5)  # Simulate time-consuming task
+
+# Create threads
+thread_A = threading.Thread(target=function_A)
+thread_B = threading.Thread(target=function_B)
+
+# Start threads
+thread_A.start()
+thread_B.start()
+
+# Wait for both threads to complete
+
+
+thread_A.join()
+thread_B.join()
+
+# Program termination
+print("\nProgram terminated.")
